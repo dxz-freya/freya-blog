@@ -26,6 +26,7 @@ const navItems = [
   {
     name: 'Two Pointer',
     href: '/algorithms/two-pointers',
+    description: '',
     problems: [
       { id: '15', title: '3Sums', href: '/algorithms/two-pointers/15' },
       // ...更多题目
@@ -34,6 +35,7 @@ const navItems = [
   {
     name: 'Sliding Window',
     href: '/algorithms/sliding-window',
+    description: '',
     problems: [
       { id: '438', title: 'Find All Anagrams in a String', href: '/algorithms/sliding-window/438' },
     ],
@@ -41,6 +43,7 @@ const navItems = [
   {
     name: 'String',
     href: '/algorithms/string',
+    description: '',
     problems: [
       { id: '560', title: 'Subarray Sum Equals K', href: '/algorithms/string/560' },
       { id: '239', title: 'Sliding Window Maximum', href: '/algorithms/string/239' },
@@ -49,6 +52,7 @@ const navItems = [
   {
     name: 'Array',
     href: '/algorithms/array',
+    description: '',
     problems: [
       { id: '53', title: 'Maximum Subarray', href: '/algorithms/array/53' },
       { id: '56', title: 'Merge Intervals', href: '/algorithms/array/56' },
