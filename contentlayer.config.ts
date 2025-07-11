@@ -19,6 +19,7 @@ import rehypeSlug from 'rehype-slug'
 import rehypeAutolinkHeadings from 'rehype-autolink-headings'
 import rehypeKatex from 'rehype-katex'
 import rehypeKatexNoTranslate from 'rehype-katex-notranslate'
+import rehypePrism from 'rehype-prism-plus'
 import rehypeCitation from 'rehype-citation'
 import rehypePrismPlus from 'rehype-prism-plus'
 import rehypePresetMinify from 'rehype-preset-minify'
@@ -127,6 +128,23 @@ export const Blog = defineDocumentType(() => ({
     },
   },
 }))
+export const Algorithm = defineDocumentType(() => ({
+  name: 'Algorithm',
+  filePathPattern: 'algorithms/**/*.mdx',
+  contentType: 'mdx',
+  fields: {
+    title: { type: 'string', required: true },
+    date: { type: 'date', required: true },
+    tags: { type: 'list', of: { type: 'string' }, default: [] },
+    summary: { type: 'string' },
+    id: { type: 'string', required: true },
+    description: { type: 'string' },
+    difficulty: { type: 'string' },
+  },
+  computedFields: {
+    ...computedFields,
+  },
+}))
 
 export const Authors = defineDocumentType(() => ({
   name: 'Authors',
@@ -149,7 +167,7 @@ export const Authors = defineDocumentType(() => ({
 
 export default makeSource({
   contentDirPath: 'data',
-  documentTypes: [Blog, Authors],
+  documentTypes: [Blog, Authors, Algorithm],
   mdx: {
     cwd: process.cwd(),
     remarkPlugins: [
@@ -161,6 +179,7 @@ export default makeSource({
       remarkAlert,
     ],
     rehypePlugins: [
+      rehypePrism,
       rehypeSlug,
       [
         rehypeAutolinkHeadings,
