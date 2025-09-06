@@ -60,15 +60,15 @@ export default function Page() {
       {/* Speaking & Teaching */}
       <div className="flex flex-row gap-4">
         <Image
-          src="/static/images/teaching.jpg"
+          src="/static/images/teaching.jpeg"
           alt="Teaching session"
           width={544}
           height={306}
           className="aspect-[3/2] w-1/2 flex-1 rounded-lg object-cover"
         />
         <Image
-          src="/static/images/speaking.jpg"
-          alt="Speaking at event"
+          src="/static/images/speaking.jpeg"
+          alt="Speaking at class"
           width={544}
           height={306}
           className="aspect-[3/2] w-1/2 flex-1 rounded-lg object-cover"
