@@ -57,6 +57,31 @@ export default function Page() {
         My camera is like a second pair of eyes, capturing memorable moments throughout my journeys.
       </p>
 
+      {/* Speaking & Teaching */}
+      <div className="flex flex-row gap-4">
+        <Image
+          src="/static/images/teaching.jpeg"
+          alt="Teaching session"
+          width={544}
+          height={306}
+          className="aspect-[3/2] w-1/2 flex-1 rounded-lg object-cover"
+        />
+        <Image
+          src="/static/images/speaking.jpeg"
+          alt="Speaking at class"
+          width={544}
+          height={306}
+          className="aspect-[3/2] w-1/2 flex-1 rounded-lg object-cover"
+        />
+      </div>
+
+      <p>
+        I occasionally take on part-time work, such as fixing computers, connecting peripherals like
+        printers, and handling other IT operations, or teaching kids how to code. The sense of
+        accomplishment from sharing knowledge is just as fulfilling as tackling technical
+        challenges.
+      </p>
+
       {/* Computer Repair */}
       <div className="flex flex-row gap-4">
         <Image
@@ -72,29 +97,6 @@ export default function Page() {
           width={544}
           height={306}
           className="aspect-[2/3] w-1/2 flex-1 rounded-lg object-cover"
-        />
-      </div>
-      <p>
-        From time to time, I also take part-time work—fixing computers at school or teaching kids
-        how to code. The sense of accomplishment from sharing knowledge is as fulfilling as solving
-        technical challenges.
-      </p>
-
-      {/* Speaking & Teaching */}
-      <div className="flex flex-row gap-4">
-        <Image
-          src="/static/images/teaching.jpg"
-          alt="Teaching session"
-          width={544}
-          height={306}
-          className="aspect-[3/2] w-1/2 flex-1 rounded-lg object-cover"
-        />
-        <Image
-          src="/static/images/speaking.jpg"
-          alt="Speaking at event"
-          width={544}
-          height={306}
-          className="aspect-[3/2] w-1/2 flex-1 rounded-lg object-cover"
         />
       </div>
       <p>
