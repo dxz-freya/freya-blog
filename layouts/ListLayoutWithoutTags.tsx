@@ -120,6 +120,7 @@ export default function ListLayoutWithoutTags({
 
   const [openIndex, setOpenIndex] = useState<number | null>(null)
   const [selectedProblem, setSelectedProblem] = useState<Algorithm | null>(null)
+  const [drawerOpen, setDrawerOpen] = useState(false)
 
   return (
     <>
@@ -128,7 +129,83 @@ export default function ListLayoutWithoutTags({
           <h1 className="text-3xl leading-9 font-extrabold tracking-tight text-gray-900 sm:hidden sm:text-4xl sm:leading-10 md:text-6xl md:leading-14 dark:text-gray-100">
             {title}
           </h1>
+          <button
+            className="mb-4 text-2xl sm:hidden"
+            onClick={() => setDrawerOpen(true)}
+            aria-label="打开导航"
+          >
+            ☰
+          </button>
         </div>
+        {drawerOpen && (
+          <div className="bg-opacity-50 fixed inset-0 z-50 flex bg-black">
+            <aside className="h-full w-64 bg-white p-4 dark:bg-gray-900">
+              <button
+                className="mb-4 text-lg"
+                onClick={() => setDrawerOpen(false)}
+                aria-label="关闭导航"
+              >
+                关闭
+              </button>
+              <nav>
+                <ul>
+                  {navItems.map((cat, idx) => (
+                    <li key={cat.name} className="mb-4">
+                      <button
+                        type="button"
+                        className="flex items-center font-bold"
+                        onClick={() => setOpenIndex(openIndex === idx ? null : idx)}
+                      >
+                        {cat.name}
+                        <span className="ml-2">{openIndex === idx ? '▼' : '▶'}</span>
+                      </button>
+                      {openIndex === idx && (
+                        <div className="mt-2 ml-2">
+                          {cat.description && (
+                            <div className="mb-2 text-blue-400">{cat.description}</div>
+                          )}
+                          <ul>
+                            {cat.problems.map((p) => (
+                              <li key={p.id}>
+                                <button
+                                  type="button"
+                                  className="block py-1 text-left hover:text-blue-500"
+                                  onClick={() => {
+                                    const fullProblem = allAlgorithms.find(
+                                      (alg) => alg.id?.toString() === p.id.toString()
+                                    )
+                                    setSelectedProblem(fullProblem ?? null)
+                                    setDrawerOpen(false) // 选中后自动关闭 Drawer
+                                  }}
+                                >
+                                  {p.id}.{p.title}
+                                </button>
+                              </li>
+                            ))}
+                          </ul>
+                        </div>
+                      )}
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            </aside>
+            {/* 点击遮罩关闭 */}
+            <div
+              className="bg-opacity-50 fixed inset-0 flex-1 bg-black"
+              role="button"
+              tabIndex={0}
+              onClick={() => setDrawerOpen(false)}
+              onKeyDown={(e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                  setDrawerOpen(false)
+                }
+              }}
+              aria-label="Close drawer"
+            />
+            {/* <div className="flex-1" onClick={() => setDrawerOpen(false)}></div> */}
+          </div>
+        )}
         <div className="flex sm:space-x-24">
           {/* 左侧导航栏 */}
           <aside className="hidden w-64 max-w-[280px] min-w-[200px] border-r border-gray-200 p-4 sm:block dark:border-gray-700">
