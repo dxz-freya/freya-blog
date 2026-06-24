@@ -1,16 +1,19 @@
 import Link from 'next/link'
-import { slug } from 'github-slugger'
+import { getTopicLabel, getTopicSlug } from '@/data/topicsData'
+
 interface Props {
   text: string
 }
 
 const Tag = ({ text }: Props) => {
+  const topicSlug = getTopicSlug(text)
+
   return (
     <Link
-      href={`/tags/${slug(text)}`}
-      className="text-primary-500 hover:text-primary-600 dark:hover:text-primary-400 mr-3 text-sm font-medium uppercase"
+      href={`/tags/${topicSlug}`}
+      className="hover:border-primary-300 hover:bg-primary-50 hover:text-primary-700 dark:hover:border-primary-500/60 dark:hover:bg-primary-950/40 dark:hover:text-primary-300 mr-2 mb-2 inline-flex rounded-full border border-gray-200 px-2.5 py-1 text-xs font-medium text-gray-600 transition-colors dark:border-gray-700 dark:text-gray-300"
     >
-      {text.split(' ').join('-')}
+      {getTopicLabel(text)}
     </Link>
   )
 }
