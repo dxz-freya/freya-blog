@@ -7,6 +7,12 @@ interface Project {
 
 const projectsData: Project[] = [
   {
+    title: 'vSOC Platform: Security Workflow Automation',
+    description: `Worked on an enterprise security operations platform at D3 Security, building workflow-heavy product features with React, TypeScript, C#/.NET, and SQL Server. My work covered playbook visualization, connection management, task workflows, notifications, application settings, RBAC, and legacy jQuery-to-React migration.`,
+    imgSrc: '/static/images/vsoc-platform.gif',
+    href: '/blog/vsoc-ai-security-workflow-automation',
+  },
+  {
     title: 'Library Management System	',
     description: `A full-featured web-based library platform designed to manage books, authors, customers, and library branches. Developed during my Master’s program, it includes secure login, role-based access, and a clean admin interface to manage library operations.`,
     imgSrc: '/static/images/library.png',

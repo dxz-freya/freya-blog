@@ -1,0 +1,145 @@
+---
+title: 'Making Security Automation Workflows Traceable'
+date: '2026-06-22'
+lastmod: '2026-06-24'
+tags: ['Security Automation', 'Workflow Traceability', 'React', 'TypeScript']
+draft: false
+summary: 'A case study on building a Preprocessing Playbook Viewer for a vSOC/SOAR platform, making high-volume security event processing easier to trace from data intake to runtime execution, composite events, and incidents.'
+images: ['/static/images/vsoc-platform.gif']
+---
+
+## Introduction
+
+When I worked on D3 Security's vSOC/SOAR platform, one thing became clear to me: automation is only useful when users can understand what happened.
+
+A security event may enter the system from an external tool, a scheduled data intake job, an alert, or a playbook error. From there, it can move through preprocessing rules, playbook runtime execution, event correlation, task review, and incident escalation. Each step may be correct on its own, but the analyst still needs to answer simple questions quickly: what ran, why did it run, what changed, and where should I look next?
+
+Much of my work was about turning that hidden execution path into something visible and reliable. The most complete example was the **Preprocessing Playbook Viewer**, a full-stack module I worked on across the React/TypeScript frontend and the C#/.NET backend APIs.
+
+<TOCInline toc={props.toc} exclude="Introduction" />
+
+## Product Context
+
+D3 Security is a SOAR and security automation platform. Customers use it to connect external tools, ingest security events, run playbooks, review tasks, and manage incident response workflows.
+
+In this kind of platform, incoming events do not always become incidents directly. They may be deduplicated, enriched, skipped, rerun, correlated into a composite event, or linked to an existing incident. That behavior is powerful, but it also creates a visibility problem: when a batch contains hundreds or thousands of events, the final result is not always obvious from the top-level processing status.
+
+The Viewer was built to make that processing path easier to inspect.
+
+## The Problem Before The Viewer
+
+Before this work, users could see that a batch was being processed, but the result was not broken down clearly enough. They could not easily tell which events were new, which ones were rerun, which ones were skipped, or which ones were already on an incident.
+
+That matters because the system can receive scheduled events every minute in real customer workflows. A batch may contain a large number of security events, and only a small subset may need further action. Without a clear breakdown, users can see activity, but they cannot easily understand the reason behind the outcome.
+
+The questions we needed to help answer were practical:
+
+- How many events were ingested?
+- Which events were new?
+- Which events were rerun?
+- Which events were skipped?
+- Which events were already on an incident?
+- Which runtime processed this event?
+- Did this event become part of a composite event?
+- Did that composite event lead to an incident?
+
+The goal was not to add another table. The goal was to make event processing explainable.
+
+## Modeling The Event Flow
+
+The first hard part was modeling the flow in a way that matched the product reality.
+
+A simplified version looked like this:
+
+```txt
+External Tool / Scheduled Event
+-> Data Intake Batch
+-> Batch Events
+-> Preprocessing Playbook Runtime
+-> Processing Result
+-> Composite Event
+-> Incident
+```
+
+The relationship was not one-to-one. A single batch could contain many events. Those events could produce many runtime records. Multiple events could be grouped into fewer composite events. Some composite events could later become incidents.
+
+In practice, the data shape was closer to this:
+
+```txt
+1 Batch
+-> N Events
+-> N Runtime Records
+-> M Composite Events
+-> K Incidents
+```
+
+That many-to-many relationship was the real engineering problem. If the UI only showed raw records, users would still have to reconstruct the story themselves. The Viewer needed to connect those records into a clear processing path.
+
+## Building The Viewer
+
+I worked on the module from the backend API layer to the React frontend.
+
+On the backend side, I helped shape APIs around the way users investigated a batch:
+
+- batch-level summary data
+- paginated event list data
+- event-level runtime and processing details
+- composite event and incident links
+
+The summary view gave users a quick breakdown of the batch: ingested events, new events, rerun events, skipped events, and events already on an incident.
+
+The event list let users inspect individual events and see their processing state. The drill-down view connected an event to its preprocessing playbook runtime, related composite event, and incident result. When a composite event or incident existed, users could click through instead of copying IDs or searching elsewhere.
+
+On the frontend, I built the viewer experience with summary cards, event tables, status labels, filters, loading states, empty states, and detail views. The React work was important, but the harder part was making sure the UI told the same story as the backend data.
+
+## Status Classification
+
+One detail I cared about was status consistency.
+
+Labels like **New**, **Rerun**, **Skipped**, and **Already on Incident** sound simple, but they are not just decoration. They represent business logic. If the summary says one number and the event list tells a different story, users will stop trusting the page.
+
+Some statuses could not be treated as a single display field. They had to be interpreted from the relationship between batch events, runtime results, composite events, and incidents. That meant the summary and the row-level view needed to use the same classification rules.
+
+For example, an existing event might be rerun through preprocessing, skipped because it did not need another execution, or marked as already on an incident. Those outcomes look similar from far away, but they mean very different things to the analyst.
+
+Making those differences visible was the main value of the feature.
+
+## Handling Large Batches
+
+Another challenge was volume.
+
+In real workflows, a batch can contain thousands of events. Returning everything at once would make the API response heavy and the frontend harder to keep responsive. It would also force users to wait for details they might never open.
+
+I changed the backend API to support pagination and separated the experience into two levels:
+
+- show the batch summary first
+- load event rows page by page
+- fetch deeper runtime, composite event, or incident detail only when the user drills in
+
+This matched the way users actually troubleshoot. Most of the time, they start with the high-level counts, then narrow down to a specific status or event. The UI should support that path instead of loading the whole lineage upfront.
+
+## Related Work: Connection Management
+
+Another area I worked on was Connection Management, which is how users connect external security tools and enterprise systems into the platform. Those connections can later be used by commands, playbooks, data intake, and automation workflows.
+
+This module had a different kind of complexity. The legacy implementation used jQuery and iframe-based editors, and the same connection flow could be opened from multiple places. It also handled security-sensitive configuration such as manual credentials, vault credentials, permissions, tenant sharing, and sites to clone.
+
+The migration was not just a visual rewrite. The important part was preserving behavior while moving toward reusable React components and clearer state ownership.
+
+For example, when a user switched between manual credentials and vault credentials, the form should not keep or submit stale credential fields. When the selected integration changed, dependent data such as credential options, clone sites, validation errors, and permission state had to reset correctly.
+
+I also handled async state consistency. Some screens loaded tenant data, clone-site information, integration metadata, and credential options from separate APIs. If users switched context quickly, an older response could arrive late and pollute the current UI. Guarding against stale responses and resetting dependent state became part of the product logic, not just a frontend detail.
+
+## What I Learned
+
+This project changed the way I think about enterprise frontend work.
+
+The hardest part was not drawing tables, cards, or labels. It was understanding the lifecycle behind the data well enough to make the UI trustworthy. In a security automation product, users need more than a final result. They need to understand why the system reached that result.
+
+I also learned that controlled state is often business logic. In configuration-heavy products, preserving the wrong value or submitting a stale field can create real product risk. State reset rules, disabled states, loading states, and payload construction all matter.
+
+Looking back, the best parts of this work were at the boundary between frontend and backend: shaping APIs around how users investigate problems, keeping large batches responsive through pagination, and turning backend workflow records into a clear path that users could follow.
+
+## Technology Stack
+
+React, TypeScript, JavaScript, C#, .NET, REST APIs, SQL Server, Ant Design, Zustand, Kendo React, SignalR, Git, Jira
